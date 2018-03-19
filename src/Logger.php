@@ -66,7 +66,6 @@ final class Logger extends AbstractLogger {
             $message = \strtr($message, $replacements);
         }
 
-        // Strip any control characters...
-        return \preg_replace('/[\x00-\x1F\x7F]/', '', $message);
+        return $message;
     }
 }

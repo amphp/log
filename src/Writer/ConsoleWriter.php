@@ -22,6 +22,10 @@ final class ConsoleWriter implements Writer {
 
     public function log(int $time, string $level, string $message) {
         $level = $this->ansify($level);
+
+        // Strip any control characters...
+        $message = \preg_replace('/[\x00-\x1F\x7F]/', '', $message);
+
         $this->writer->log($time, $level, $message);
     }
 
