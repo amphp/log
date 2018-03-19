@@ -20,13 +20,13 @@ final class ConsoleWriter implements Writer {
         $this->setAnsiColorOption();
     }
 
-    public function log(int $time, string $level, string $message) {
+    public function log(string $level, string $message, array $context) {
         $level = $this->ansify($level);
 
         // Strip any control characters...
         $message = \preg_replace('/[\x00-\x1F\x7F]/', '', $message);
 
-        $this->writer->log($time, $level, $message);
+        $this->writer->log($level, $message, $context);
     }
 
     public function setAnsiColorOption(string $value = null) {

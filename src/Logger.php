@@ -44,8 +44,7 @@ final class Logger extends AbstractLogger {
         }
 
         $message = $this->formatMessage($message, $context);
-        $time = $context["time"] ?? \time();
-        $this->writer->log($time, $level, $message);
+        $this->writer->log($level, $message, $context);
     }
 
     private function shouldEmit(string $logLevel): bool {
