@@ -24,7 +24,7 @@ final class Logger extends AbstractLogger {
     private $writer;
 
     /**
-     * @param \Amp\Log\Writer $writer
+     * @param Writer $writer
      * @param string $logLevel Use the PSR-3 LogLevel constants.
      *
      * @throws \Error If the log-level is invalid.
@@ -57,7 +57,7 @@ final class Logger extends AbstractLogger {
         foreach ($context as $key => $replacement) {
             // avoid invalid casts to string
             if (!\is_array($replacement) && (!\is_object($replacement) || \method_exists($replacement, '__toString'))) {
-                $replacements["{{$key}}"] = $replacement;
+                $replacements["{{$key}}"] = (string) $replacement;
             }
         }
 

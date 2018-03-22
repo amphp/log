@@ -9,24 +9,20 @@ use Psr\Log\LogLevel;
 use function Amp\Log\hasColorSupport;
 
 final class ConsoleWriter implements Writer {
-    /** @var OutputStream */
-    private $writer;
+    /** @var StreamWriter */
+    private $streamWriter;
 
     /** @var bool */
     private $colors;
 
     public function __construct() {
-        $this->writer = new StreamWriter(new ResourceOutputStream(\STDOUT));
+        $this->streamWriter = new StreamWriter(new ResourceOutputStream(\STDOUT));
         $this->setAnsiColorOption();
     }
 
     public function log(string $level, string $message, array $context) {
         $level = $this->ansify($level);
-
-        // Strip any control characters...
-        $message = \preg_replace('/[\x00-\x1F\x7F]/', '', $message);
-
-        $this->writer->log($level, $message, $context);
+        $this->streamWriter->log($level, $message, $context);
     }
 
     public function setAnsiColorOption(string $value = null) {
