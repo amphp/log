@@ -1,32 +1,37 @@
 <?php
 
-namespace Amp\Log\Writer;
+namespace Amp\Log;
 
 use Amp\ByteStream\OutputStream;
 use Amp\ByteStream\ResourceOutputStream;
-use Amp\Log\Writer;
+use Amp\Log\Handler;
+use Monolog\Formatter\LineFormatter;
+use Monolog\Formatter\NormalizerFormatter;
 use Psr\Log\LogLevel;
 use function Amp\Log\hasColorSupport;
 
-final class ConsoleWriter implements Writer {
-    /** @var StreamWriter */
-    private $streamWriter;
+final class ConsoleFormatter extends LineFormatter {
+    const DEFAULT_FORMAT = "[%datetime%] %level_name%.%channel%: %message% %context% %extra%\r\n";
 
     /** @var bool */
     private $colors;
 
-    public function __construct() {
-        $this->streamWriter = new StreamWriter(new ResourceOutputStream(\STDOUT));
+    public function __construct(string $format = null, string $dateFormat = null, bool $allowInlineLineBreaks = false, bool $ignoreEmptyContextAndExtra = false) {
+        parent::__construct($format ?? self::DEFAULT_FORMAT, $dateFormat, $allowInlineLineBreaks, $ignoreEmptyContextAndExtra);
         $this->setAnsiColorOption();
     }
 
-    public function log(string $level, string $message, array $context) {
-        $level = $this->ansify($level);
-        $this->streamWriter->log($level, $message, $context);
+    public function format(array $record): string {
+        if ($this->colors) {
+            $record['level_name'] = $this->ansifyLevel($record['level_name']);
+            $record['channel'] = "\033[1m{$record['channel']}\033[0m";
+        }
+
+        return parent::format($record);
     }
 
-    public function setAnsiColorOption(string $value = null) {
-        $value = $value ?? (\getenv("AMP_LOG_COLOR") ?: (\defined("AMP_LOG_COLOR") ? \AMP_LOG_COLOR : false));
+    private function setAnsiColorOption() {
+        $value = \getenv("AMP_LOG_COLOR");
         if ($value === false || $value === '') {
             $value = "auto";
         }
@@ -49,7 +54,9 @@ final class ConsoleWriter implements Writer {
         }
     }
 
-    private function ansify(string $level): string {
+    private function ansifyLevel(string $level): string {
+        $level = \strtolower($level);
+
         switch ($level) {
             case LogLevel::EMERGENCY:
             case LogLevel::ALERT:

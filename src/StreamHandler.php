@@ -1,11 +1,12 @@
 <?php
 
-namespace Amp\Log\Writer;
+namespace Amp\Log;
 
 use Amp\ByteStream\OutputStream;
-use Amp\Log\Writer;
+use Monolog\Handler\AbstractProcessingHandler;
+use Psr\Log\LogLevel;
 
-final class StreamWriter implements Writer {
+final class StreamHandler extends AbstractProcessingHandler {
     /** @var OutputStream */
     private $stream;
 
@@ -17,8 +18,11 @@ final class StreamWriter implements Writer {
 
     /**
      * @param OutputStream $outputStream
+     * @param string       $level
+     * @param bool         $bubble
      */
-    public function __construct(OutputStream $outputStream) {
+    public function __construct(OutputStream $outputStream, string $level = LogLevel::DEBUG, bool $bubble = true) {
+        parent::__construct($level, $bubble);
         $this->stream = $outputStream;
 
         $stream = &$this->stream;
@@ -37,18 +41,18 @@ final class StreamWriter implements Writer {
         };
     }
 
-    public function log(string $level, string $message, array $context) {
+    /**
+     * Writes the record down to the log of the implementing handler
+     *
+     * @param  array $record
+     *
+     * @return void
+     */
+    protected function write(array $record) {
         if ($this->exception) {
             throw $this->exception;
         }
 
-        $time = $context["time"] ?? \time();
-        $date = @\date("Y-m-d H:i:s", $time);
-
-        foreach (\explode("\n", $message) as $line) {
-            // Strip any control characters...
-            $line = \preg_replace('/[\x00-\x1F\x7F]/', '', $line);
-            $this->stream->write($date . " {$level} {$line}\r\n")->onResolve($this->onResolve);
-        }
+        $this->stream->write((string) $record['formatted'])->onResolve($this->onResolve);
     }
 }
