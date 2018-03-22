@@ -31,9 +31,9 @@ final class StreamWriter implements Writer {
             if ($e) {
                 $stream = null;
                 $exception = $e;
-            }
 
-            throw $e;
+                throw $e;
+            }
         };
     }
 
