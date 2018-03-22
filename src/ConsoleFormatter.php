@@ -11,7 +11,7 @@ use Psr\Log\LogLevel;
 use function Amp\Log\hasColorSupport;
 
 final class ConsoleFormatter extends LineFormatter {
-    const DEFAULT_FORMAT = "[%datetime%] %level_name%.%channel%: %message% %context% %extra%\r\n";
+    const DEFAULT_FORMAT = "[%datetime%] %channel%.%level_name%: %message% %context% %extra%\r\n";
 
     /** @var bool */
     private $colors;
