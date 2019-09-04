@@ -2,7 +2,8 @@
 
 namespace Amp\Log;
 
-function hasColorSupport(): bool {
+function hasColorSupport(): bool
+{
     $os = (\stripos(\PHP_OS, "WIN") === 0) ? "win" : \strtolower(\PHP_OS);
 
     // @see https://github.com/symfony/symfony/blob/v4.0.6/src/Symfony/Component/Console/Output/StreamOutput.php#L91

@@ -2,26 +2,24 @@
 
 namespace Amp\Log;
 
-use Amp\ByteStream\OutputStream;
-use Amp\ByteStream\ResourceOutputStream;
-use Amp\Log\Handler;
 use Monolog\Formatter\LineFormatter;
-use Monolog\Formatter\NormalizerFormatter;
 use Psr\Log\LogLevel;
-use function Amp\Log\hasColorSupport;
 
-final class ConsoleFormatter extends LineFormatter {
+final class ConsoleFormatter extends LineFormatter
+{
     const DEFAULT_FORMAT = "[%datetime%] %channel%.%level_name%: %message% %context% %extra%\r\n";
 
     /** @var bool */
     private $colors;
 
-    public function __construct(string $format = null, string $dateFormat = null, bool $allowInlineLineBreaks = false, bool $ignoreEmptyContextAndExtra = false) {
+    public function __construct(string $format = null, string $dateFormat = null, bool $allowInlineLineBreaks = false, bool $ignoreEmptyContextAndExtra = false)
+    {
         parent::__construct($format ?? self::DEFAULT_FORMAT, $dateFormat, $allowInlineLineBreaks, $ignoreEmptyContextAndExtra);
         $this->setAnsiColorOption();
     }
 
-    public function format(array $record): string {
+    public function format(array $record): string
+    {
         if ($this->colors) {
             $record['level_name'] = $this->ansifyLevel($record['level_name']);
             $record['channel'] = "\033[1m{$record['channel']}\033[0m";
@@ -30,7 +28,8 @@ final class ConsoleFormatter extends LineFormatter {
         return parent::format($record);
     }
 
-    private function setAnsiColorOption() {
+    private function setAnsiColorOption(): void
+    {
         $value = \getenv("AMP_LOG_COLOR");
         if ($value === false || $value === '') {
             $value = "auto";
@@ -54,7 +53,8 @@ final class ConsoleFormatter extends LineFormatter {
         }
     }
 
-    private function ansifyLevel(string $level): string {
+    private function ansifyLevel(string $level): string
+    {
         $level = \strtolower($level);
 
         switch ($level) {

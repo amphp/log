@@ -6,7 +6,8 @@ use Amp\ByteStream\OutputStream;
 use Monolog\Handler\AbstractProcessingHandler;
 use Psr\Log\LogLevel;
 
-final class StreamHandler extends AbstractProcessingHandler {
+final class StreamHandler extends AbstractProcessingHandler
+{
     /** @var OutputStream */
     private $stream;
 
@@ -21,7 +22,8 @@ final class StreamHandler extends AbstractProcessingHandler {
      * @param string       $level
      * @param bool         $bubble
      */
-    public function __construct(OutputStream $outputStream, string $level = LogLevel::DEBUG, bool $bubble = true) {
+    public function __construct(OutputStream $outputStream, string $level = LogLevel::DEBUG, bool $bubble = true)
+    {
         parent::__construct($level, $bubble);
         $this->stream = $outputStream;
 
@@ -42,13 +44,14 @@ final class StreamHandler extends AbstractProcessingHandler {
     }
 
     /**
-     * Writes the record down to the log of the implementing handler
+     * Writes the record down to the log of the implementing handler.
      *
      * @param  array $record
      *
      * @return void
      */
-    protected function write(array $record) {
+    protected function write(array $record): void
+    {
         if ($this->exception) {
             throw $this->exception;
         }
