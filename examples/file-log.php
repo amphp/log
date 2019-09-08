@@ -1,16 +1,20 @@
 <?php
 
-use Amp\ByteStream;
-use Amp\Log\ConsoleFormatter;
+use Amp\File;
 use Amp\Log\StreamHandler;
 use Amp\Loop;
+use Monolog\Formatter\LineFormatter;
 use Monolog\Logger;
 
 require dirname(__DIR__) . '/vendor/autoload.php';
 
+// This example requires amphp/file to be installed.
+
 Loop::run(function () {
-    $handler = new StreamHandler(ByteStream\getStdout());
-    $handler->setFormatter(new ConsoleFormatter);
+    $file = yield File\open(__DIR__ . '/example.log', 'w');
+
+    $handler = new StreamHandler($file);
+    $handler->setFormatter(new LineFormatter);
 
     $logger = new Logger('hello-world');
     $logger->pushHandler($handler);
