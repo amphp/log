@@ -5,17 +5,16 @@ namespace Amp\Log;
 use Amp\ByteStream\OutputStream;
 use Monolog\Handler\AbstractProcessingHandler;
 use Psr\Log\LogLevel;
+use function Amp\async;
 
 final class StreamHandler extends AbstractProcessingHandler
 {
-    /** @var OutputStream */
-    private $stream;
+    private OutputStream $stream;
 
     /** @var callable */
     private $onResolve;
 
-    /** @var \Throwable|null */
-    private $exception;
+    private ?\Throwable $exception = null;
 
     /**
      * @param OutputStream $outputStream
@@ -56,6 +55,6 @@ final class StreamHandler extends AbstractProcessingHandler
             throw $this->exception;
         }
 
-        $this->stream->write((string) $record['formatted'])->onResolve($this->onResolve);
+        async(fn() => $this->stream->write((string) $record['formatted']))->onResolve($this->onResolve);
     }
 }
