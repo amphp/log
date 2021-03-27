@@ -22,14 +22,22 @@
             "email": "me@kelunik.com"
         }
     ],
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "git@github.com:revolt-php/event-loop.git"
+        }
+    ],
     "require": {
         "php": ">=8",
-        "amphp/amp": "^3-dev",
-        "amphp/byte-stream": "^2-dev",
+        "amphp/amp": "dev-v3-revolt",
+        "amphp/byte-stream": "dev-v2-revolt",
         "monolog/monolog": "^2 || ^1.23"
     },
     "require-dev": {
-        "amphp/phpunit-util": "^2-dev",
+        "amphp/phpunit-util": "dev-v2-revolt",
         "amphp/php-cs-fixer-config": "dev-master",
         "phpunit/phpunit": "^9"
     },
