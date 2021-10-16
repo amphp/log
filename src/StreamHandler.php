@@ -31,6 +31,6 @@ final class StreamHandler extends AbstractProcessingHandler
      */
     protected function write(array $record): void
     {
-        $this->stream->write((string) $record['formatted']);
+        $this->stream->write((string) $record['formatted'])->await();
     }
 }
