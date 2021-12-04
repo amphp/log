@@ -2,24 +2,24 @@
 
 namespace Amp\Log;
 
-use Amp\ByteStream\OutputStream;
+use Amp\ByteStream\WritableStream;
 use Monolog\Handler\AbstractProcessingHandler;
 use Psr\Log\LogLevel;
 
 final class StreamHandler extends AbstractProcessingHandler
 {
-    private OutputStream $stream;
+    private WritableStream $stream;
 
     /**
-     * @param OutputStream $outputStream
+     * @param WritableStream $WritableStream
      * @param string       $level
      * @param bool         $bubble
      */
-    public function __construct(OutputStream $outputStream, string $level = LogLevel::DEBUG, bool $bubble = true)
+    public function __construct(WritableStream $WritableStream, string $level = LogLevel::DEBUG, bool $bubble = true)
     {
         parent::__construct($level, $bubble);
 
-        $this->stream = $outputStream;
+        $this->stream = $WritableStream;
     }
 
     /**
