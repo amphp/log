@@ -10,6 +10,7 @@ final class StreamHandler extends AbstractProcessingHandler
 {
     private WritableStream $sink;
 
+    /** @psalm-suppress ArgumentTypeCoercion */
     public function __construct(WritableStream $sink, string $level = LogLevel::DEBUG, bool $bubble = true)
     {
         parent::__construct($level, $bubble);
