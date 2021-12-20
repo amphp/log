@@ -4,11 +4,10 @@ namespace Amp\Log;
 
 function hasColorSupport(): bool
 {
-    $os = (\stripos(\PHP_OS, "WIN") === 0) ? "win" : \strtolower(\PHP_OS);
-
     // @see https://github.com/symfony/symfony/blob/v4.0.6/src/Symfony/Component/Console/Output/StreamOutput.php#L91
     // @license https://github.com/symfony/symfony/blob/v4.0.6/LICENSE
-    if ($os === 'win') {
+    if (\PHP_OS_FAMILY === 'Windows') {
+        /** @psalm-suppress UndefinedConstant */
         $windowsVersion = PHP_WINDOWS_VERSION_MAJOR . '.' . PHP_WINDOWS_VERSION_MINOR . '.' . PHP_WINDOWS_VERSION_BUILD;
 
         return (\function_exists('sapi_windows_vt100_support') && @\sapi_windows_vt100_support(\STDOUT))

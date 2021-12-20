@@ -14,6 +14,8 @@ final class StreamHandler extends AbstractProcessingHandler
      * @param WritableStream $WritableStream
      * @param string       $level
      * @param bool         $bubble
+     *
+     * @phpstan-param LogLevel::* $level
      */
     public function __construct(WritableStream $WritableStream, string $level = LogLevel::DEBUG, bool $bubble = true)
     {
@@ -31,6 +33,6 @@ final class StreamHandler extends AbstractProcessingHandler
      */
     protected function write(array $record): void
     {
-        $this->stream->write((string) $record['formatted'])->await();
+        $this->stream->write((string) $record['formatted']);
     }
 }

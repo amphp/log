@@ -7,15 +7,26 @@ use Psr\Log\LogLevel;
 
 final class ConsoleFormatter extends LineFormatter
 {
-    const DEFAULT_FORMAT = "[%datetime%] %channel%.%level_name%: %message% %context% %extra%\r\n";
+    public const DEFAULT_FORMAT = "[%datetime%] %channel%.%level_name%: %message% %context% %extra%\r\n";
 
     /** @var bool */
     private bool $colors;
 
-    public function __construct(string $format = null, string $dateFormat = null, bool $allowInlineLineBreaks = false, bool $ignoreEmptyContextAndExtra = false)
-    {
-        parent::__construct($format ?? self::DEFAULT_FORMAT, $dateFormat, $allowInlineLineBreaks, $ignoreEmptyContextAndExtra);
-        $this->setAnsiColorOption();
+    public function __construct(
+        ?string $format = null,
+        ?string $dateFormat = null,
+        bool $allowInlineLineBreaks = false,
+        bool $ignoreEmptyContextAndExtra = false
+    ) {
+        parent::__construct(
+            $format ?? self::DEFAULT_FORMAT,
+            $dateFormat,
+            $allowInlineLineBreaks,
+            $ignoreEmptyContextAndExtra
+        );
+
+        $this->includeStacktraces = false;
+        $this->colors = $this->determineAnsiColorOption();
     }
 
     public function format(array $record): string
@@ -28,7 +39,7 @@ final class ConsoleFormatter extends LineFormatter
         return parent::format($record);
     }
 
-    private function setAnsiColorOption(): void
+    private function determineAnsiColorOption(): bool
     {
         $value = \getenv("AMP_LOG_COLOR");
         if ($value === false || $value === '') {
@@ -36,21 +47,11 @@ final class ConsoleFormatter extends LineFormatter
         }
 
         $value = \strtolower($value);
-        switch ($value) {
-            case "1":
-            case "true":
-            case "on":
-                $this->colors = true;
-                break;
-            case "0":
-            case "false":
-            case "off":
-                $this->colors = false;
-                break;
-            default:
-                $this->colors = hasColorSupport();
-                break;
-        }
+        return match ($value) {
+            "1", "true", "on" => true,
+            "0", "false", "off" => false,
+            default => hasColorSupport(),
+        };
     }
 
     private function ansifyLevel(string $level): string

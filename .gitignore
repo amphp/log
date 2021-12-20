@@ -5,3 +5,4 @@
 /examples/example.log
 /phpunit.xml
 /vendor
+/composer-require-checker.phar

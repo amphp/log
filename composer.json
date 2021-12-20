@@ -1,7 +1,7 @@
 {
     "name": "amphp/log",
     "homepage": "https://github.com/amphp/log",
-    "description": "Non-blocking logging for PHP based on Amp and Monolog.",
+    "description": "Non-blocking logging for PHP based on Amp, Revolt, and Monolog.",
     "keywords": [
         "log",
         "logging",
@@ -26,15 +26,17 @@
     "prefer-stable": true,
     "require": {
         "php": ">=8",
-        "amphp/amp": "v3.x-dev",
-        "amphp/byte-stream": "v2.x-dev",
-        "monolog/monolog": "^2 || ^1.23"
+        "amphp/amp": "^3",
+        "amphp/byte-stream": "^2",
+        "monolog/monolog": "^2 || ^1.23",
+        "psr/log": "^3.0"
     },
     "require-dev": {
-        "amphp/phpunit-util": "v2.x-dev",
-        "amphp/file": "v3.x-dev",
+        "amphp/phpunit-util": "^3",
+        "amphp/file": "^3",
         "amphp/php-cs-fixer-config": "dev-master",
-        "phpunit/phpunit": "^9"
+        "phpunit/phpunit": "^9",
+        "psalm/phar": "^4.15"
     },
     "autoload": {
         "psr-4": {
@@ -43,11 +45,6 @@
         "files": [
             "src/functions.php"
         ]
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "Amp\\Log\\Test\\": "test"
-        }
     },
     "scripts": {
         "test": "@php -dzend.assertions=1 -dassert.exception=1 ./vendor/bin/phpunit",
