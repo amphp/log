@@ -8,31 +8,17 @@ use Psr\Log\LogLevel;
 
 final class StreamHandler extends AbstractProcessingHandler
 {
-    private WritableStream $stream;
+    private WritableStream $sink;
 
-    /**
-     * @param WritableStream $WritableStream
-     * @param string       $level
-     * @param bool         $bubble
-     *
-     * @phpstan-param LogLevel::* $level
-     */
-    public function __construct(WritableStream $WritableStream, string $level = LogLevel::DEBUG, bool $bubble = true)
+    public function __construct(WritableStream $sink, string $level = LogLevel::DEBUG, bool $bubble = true)
     {
         parent::__construct($level, $bubble);
 
-        $this->stream = $WritableStream;
+        $this->sink = $sink;
     }
 
-    /**
-     * Writes the record down to the log of the implementing handler.
-     *
-     * @param array $record
-     *
-     * @return void
-     */
     protected function write(array $record): void
     {
-        $this->stream->write((string) $record['formatted']);
+        $this->sink->write((string) $record['formatted']);
     }
 }

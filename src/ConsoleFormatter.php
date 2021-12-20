@@ -9,7 +9,6 @@ final class ConsoleFormatter extends LineFormatter
 {
     public const DEFAULT_FORMAT = "[%datetime%] %channel%.%level_name%: %message% %context% %extra%\r\n";
 
-    /** @var bool */
     private bool $colors;
 
     public function __construct(
@@ -58,22 +57,13 @@ final class ConsoleFormatter extends LineFormatter
     {
         $level = \strtolower($level);
 
-        switch ($level) {
-            case LogLevel::EMERGENCY:
-            case LogLevel::ALERT:
-            case LogLevel::CRITICAL:
-            case LogLevel::ERROR:
-                return "\033[1;31m{$level}\033[0m"; // bold + red
-            case LogLevel::WARNING:
-                return "\033[1;33m{$level}\033[0m"; // bold + yellow
-            case LogLevel::NOTICE:
-                return "\033[1;32m{$level}\033[0m"; // bold + green
-            case LogLevel::INFO:
-                return "\033[1;35m{$level}\033[0m"; // bold + magenta
-            case LogLevel::DEBUG:
-                return "\033[1;36m{$level}\033[0m"; // bold + cyan
-            default:
-                return "\033[1m{$level}\033[0m"; // bold
-        }
+        return match ($level) {
+            LogLevel::EMERGENCY, LogLevel::ALERT, LogLevel::CRITICAL, LogLevel::ERROR => "\033[1;31m{$level}\033[0m",
+            LogLevel::WARNING => "\033[1;33m{$level}\033[0m",
+            LogLevel::NOTICE => "\033[1;32m{$level}\033[0m",
+            LogLevel::INFO => "\033[1;35m{$level}\033[0m",
+            LogLevel::DEBUG => "\033[1;36m{$level}\033[0m",
+            default => "\033[1m{$level}\033[0m",
+        };
     }
 }
