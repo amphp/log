@@ -3,14 +3,14 @@
 namespace Amp\Log;
 
 use Monolog\Formatter\LineFormatter;
-use Monolog\Level;
 use Monolog\LogRecord;
+use Psr\Log\LogLevel;
 
 final class ConsoleFormatter extends LineFormatter
 {
     public const DEFAULT_FORMAT = "[%datetime%] %channel%.%level_name%: %message% %context% %extra%\r\n";
 
-    private readonly bool $colors;
+    private readonly bool $ansify;
 
     public function __construct(
         ?string $format = null,
@@ -26,15 +26,36 @@ final class ConsoleFormatter extends LineFormatter
         );
 
         $this->includeStacktraces = false;
-        $this->colors = $this->determineAnsiColorOption();
+        $this->ansify = $this->determineAnsiColorOption();
     }
 
+    /**
+     * Applies ansi colors to log record for Monolog v1.x and v2.x.
+     *
+     * @param array{level_name: string, channel: string}|LogRecord $record Array for Monolog v1.x or 2.x
+     *      and LogRecord for v3.x.
+     */
+    public function format(array|LogRecord $record): string
+    {
+        // For Monolog v1.x and v2.x
+        if (\is_array($record) && $this->ansify) {
+            $record['level_name'] = $this->ansifyLevel(\strtolower($record['level_name']));
+            $record['channel'] = "\033[1m{$record['channel']}\033[0m";
+        }
+
+        /** @psalm-suppress PossiblyInvalidArgument */
+        return parent::format($record);
+    }
+
+    /**
+     * Applies ansi colors to log record for Monolog v3.x.
+     */
     protected function normalizeRecord(LogRecord $record): array
     {
         $fields = parent::normalizeRecord($record);
 
-        if ($this->colors) {
-            $fields['level_name'] = $this->ansifyLevel($record->level);
+        if ($this->ansify) {
+            $fields['level_name'] = $this->ansifyLevel($record->level->toPsrLogLevel());
             $fields['channel'] = "\033[1m{$record->channel}\033[0m";
         }
 
@@ -55,17 +76,18 @@ final class ConsoleFormatter extends LineFormatter
         };
     }
 
-    private function ansifyLevel(Level $level): string
+    private function ansifyLevel(string $level): string
     {
         return "\033[" . match ($level) {
-            Level::Emergency => "43",
-            Level::Alert => "45",
-            Level::Critical => "41",
-            Level::Error => "0;31",
-            Level::Warning => "0;33",
-            Level::Notice => "0;32",
-            Level::Info => "0;34",
-            Level::Debug => "0;36",
-        } . "m" . $level->toPsrLogLevel() . "\033[0m";
+            LogLevel::EMERGENCY => "43",
+            LogLevel::ALERT => "45",
+            LogLevel::CRITICAL => "41",
+            LogLevel::ERROR => "0;31",
+            LogLevel::WARNING => "0;33",
+            LogLevel::NOTICE => "0;32",
+            LogLevel::INFO => "0;34",
+            LogLevel::DEBUG => "0;36",
+            default => "40",
+        } . "m" . $level . "\033[0m";
     }
 }
