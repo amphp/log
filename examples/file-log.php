@@ -12,7 +12,7 @@ require dirname(__DIR__) . '/vendor/autoload.php';
 $file = File\openFile(__DIR__ . '/example.log', 'w');
 
 $handler = new StreamHandler($file);
-$handler->setFormatter(new LineFormatter);
+$handler->setFormatter(new LineFormatter());
 
 $logger = new Logger('hello-world');
 $logger->pushHandler($handler);
@@ -20,5 +20,8 @@ $logger->pushHandler($handler);
 $logger->debug("Hello, world!");
 $logger->info("Hello, world!");
 $logger->notice("Hello, world!");
+$logger->warning("Hello, world!");
 $logger->error("Hello, world!");
+$logger->critical("Hello, world!");
 $logger->alert("Hello, world!");
+$logger->emergency("Hello, world!");

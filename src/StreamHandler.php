@@ -4,6 +4,7 @@ namespace Amp\Log;
 
 use Amp\ByteStream\WritableStream;
 use Monolog\Handler\AbstractProcessingHandler;
+use Monolog\LogRecord;
 use Psr\Log\LogLevel;
 
 final class StreamHandler extends AbstractProcessingHandler
@@ -18,8 +19,16 @@ final class StreamHandler extends AbstractProcessingHandler
         $this->sink = $sink;
     }
 
-    protected function write(array $record): void
+    protected function write(LogRecord $record): void
     {
-        $this->sink->write((string) $record['formatted']);
+        if (!\is_string($record->formatted)) {
+            throw new \ValueError(\sprintf(
+                '%s only supports writing string formatted log records, got "%s"',
+                self::class,
+                \get_debug_type($record->formatted),
+            ));
+        }
+
+        $this->sink->write($record->formatted);
     }
 }

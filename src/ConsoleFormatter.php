@@ -3,19 +3,20 @@
 namespace Amp\Log;
 
 use Monolog\Formatter\LineFormatter;
-use Psr\Log\LogLevel;
+use Monolog\Level;
+use Monolog\LogRecord;
 
 final class ConsoleFormatter extends LineFormatter
 {
     public const DEFAULT_FORMAT = "[%datetime%] %channel%.%level_name%: %message% %context% %extra%\r\n";
 
-    private bool $colors;
+    private readonly bool $colors;
 
     public function __construct(
         ?string $format = null,
         ?string $dateFormat = null,
         bool $allowInlineLineBreaks = false,
-        bool $ignoreEmptyContextAndExtra = false
+        bool $ignoreEmptyContextAndExtra = false,
     ) {
         parent::__construct(
             $format ?? self::DEFAULT_FORMAT,
@@ -28,14 +29,16 @@ final class ConsoleFormatter extends LineFormatter
         $this->colors = $this->determineAnsiColorOption();
     }
 
-    public function format(array $record): string
+    protected function normalizeRecord(LogRecord $record): array
     {
+        $fields = parent::normalizeRecord($record);
+
         if ($this->colors) {
-            $record['level_name'] = $this->ansifyLevel($record['level_name']);
-            $record['channel'] = "\033[1m{$record['channel']}\033[0m";
+            $fields['level_name'] = $this->ansifyLevel($record->level);
+            $fields['channel'] = "\033[1m{$record->channel}\033[0m";
         }
 
-        return parent::format($record);
+        return $fields;
     }
 
     private function determineAnsiColorOption(): bool
@@ -45,25 +48,24 @@ final class ConsoleFormatter extends LineFormatter
             $value = "auto";
         }
 
-        $value = \strtolower($value);
-        return match ($value) {
+        return match (\strtolower($value)) {
             "1", "true", "on" => true,
             "0", "false", "off" => false,
             default => hasColorSupport(),
         };
     }
 
-    private function ansifyLevel(string $level): string
+    private function ansifyLevel(Level $level): string
     {
-        $level = \strtolower($level);
-
-        return match ($level) {
-            LogLevel::EMERGENCY, LogLevel::ALERT, LogLevel::CRITICAL, LogLevel::ERROR => "\033[1;31m{$level}\033[0m",
-            LogLevel::WARNING => "\033[1;33m{$level}\033[0m",
-            LogLevel::NOTICE => "\033[1;32m{$level}\033[0m",
-            LogLevel::INFO => "\033[1;35m{$level}\033[0m",
-            LogLevel::DEBUG => "\033[1;36m{$level}\033[0m",
-            default => "\033[1m{$level}\033[0m",
-        };
+        return "\033[" . match ($level) {
+            Level::Emergency => "43",
+            Level::Alert => "45",
+            Level::Critical => "41",
+            Level::Error => "0;31",
+            Level::Warning => "0;33",
+            Level::Notice => "0;32",
+            Level::Info => "0;34",
+            Level::Debug => "0;36",
+        } . "m" . $level->toPsrLogLevel() . "\033[0m";
     }
 }
