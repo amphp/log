@@ -4,6 +4,7 @@ namespace Amp\Log;
 
 use Amp\ByteStream\OutputStream;
 use Monolog\Handler\AbstractProcessingHandler;
+use Monolog\LogRecord;
 use Psr\Log\LogLevel;
 
 final class StreamHandler extends AbstractProcessingHandler
@@ -46,16 +47,31 @@ final class StreamHandler extends AbstractProcessingHandler
     /**
      * Writes the record down to the log of the implementing handler.
      *
-     * @param  array $record
+     * @param LogRecord|array $record
      *
      * @return void
      */
-    protected function write(array $record): void
+    protected function write($record): void
     {
         if ($this->exception) {
             throw $this->exception;
         }
 
-        $this->stream->write((string) $record['formatted'])->onResolve($this->onResolve);
+        if ($record instanceof LogRecord) {
+            $formatted = $record->formatted;
+        } else {
+            \assert(\is_array($record));
+            $formatted = $record['formatted'];
+        }
+
+        if (!\is_string($formatted)) {
+            throw new \ValueError(\sprintf(
+                '%s only supports writing string formatted log records, got "%s"',
+                self::class,
+                \gettype($formatted)
+            ));
+        }
+
+        $this->stream->write($formatted)->onResolve($this->onResolve);
     }
 }

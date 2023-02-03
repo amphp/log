@@ -3,6 +3,7 @@
 namespace Amp\Log;
 
 use Monolog\Formatter\LineFormatter;
+use Monolog\LogRecord;
 use Psr\Log\LogLevel;
 
 final class ConsoleFormatter extends LineFormatter
@@ -18,8 +19,34 @@ final class ConsoleFormatter extends LineFormatter
         $this->setAnsiColorOption();
     }
 
-    public function format(array $record): string
+    /**
+     * Used only when Monolog v3.x is installed.
+     */
+    protected function normalizeRecord(LogRecord $record): array
     {
+        $fields = parent::normalizeRecord($record);
+
+        if ($this->colors) {
+            $fields['level_name'] = $this->ansifyLevel($record->level->name);
+            $fields['channel'] = "\033[1m{$record->channel}\033[0m";
+        }
+
+        return $fields;
+    }
+
+    /**
+     * @param LogRecord|array $record
+     */
+    public function format($record): string
+    {
+        if ($record instanceof LogRecord) {
+            // Executed only when using Monolog v3.x.
+            return parent::format($record);
+        }
+
+        \assert(\is_array($record));
+
+        // For Monolog v2.x and 1.x
         if ($this->colors) {
             $record['level_name'] = $this->ansifyLevel($record['level_name']);
             $record['channel'] = "\033[1m{$record['channel']}\033[0m";
