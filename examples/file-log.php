@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 use Amp\File;
 use Amp\Log\StreamHandler;

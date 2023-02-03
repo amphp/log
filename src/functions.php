@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Amp\Log;
 
@@ -10,7 +10,7 @@ function hasColorSupport(): bool
         /** @psalm-suppress UndefinedConstant */
         $windowsVersion = PHP_WINDOWS_VERSION_MAJOR . '.' . PHP_WINDOWS_VERSION_MINOR . '.' . PHP_WINDOWS_VERSION_BUILD;
 
-        return (\function_exists('sapi_windows_vt100_support') && @\sapi_windows_vt100_support(\STDOUT))
+        return (\function_exists('sapi_windows_vt100_support') && @sapi_windows_vt100_support(\STDOUT))
             || $windowsVersion === '10.0.10586' // equals is correct here, newer versions use the above function
             || false !== \getenv('ANSICON')
             || 'ON' === \getenv('ConEmuANSI')
