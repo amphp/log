@@ -13,10 +13,13 @@ final class StreamHandler extends AbstractProcessingHandler
     private WritableStream $sink;
 
     /**
-     * @param Level|value-of<Level>|LogLevel::* $level
+     * @param WritableStream $sink Stream to write the logs to
+     * @param Level|value-of<Level>|LogLevel::* $level The minimum logging level at which this handler will be triggered
+     * @param bool $bubble Whether the messages that are handled can bubble up the stack or not
      */
     public function __construct(WritableStream $sink, int|string|Level $level = LogLevel::DEBUG, bool $bubble = true)
     {
+        /** @psalm-suppress PossiblyInvalidArgument */
         parent::__construct($level, $bubble);
 
         $this->sink = $sink;
